@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>{{ course.name }} Test</h3>
+        <span class="badge bg-danger fs-6" id="timer">10:00</span>
+    </div>
+
+    <!-- Question Navigation -->
+    <div class="d-flex flex-wrap mb-3">
+        {% for field in form %}
+            <span class="badge bg-secondary m-1 q-number" id="qnav-{{ forloop.counter }}">
+                {{ forloop.counter }}
+            </span>
+        {% endfor %}
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress mb-4" style="height:10px;">
+        <div class="progress-bar" role="progressbar" style="width: 0%;" id="progress"></div>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="card mb-4 p-3 shadow-sm question-card" id="q{{ forloop.counter }}">
+            
+            <h5 class="mb-3">
+                Question {{ forloop.counter }}
+            </h5>
+
+            <p class="fw-semibold">{{ field.label }}</p>
+
+            <div class="options">
+                {{ field }}
+            </div>
+
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-success w-100 py-2 fs-5">
+            Submit Test
+        </button>
+
+    </form>
+
+</div>
+
+<!-- Styling -->
+<style>
+.question-card {
+    border-radius: 12px;
+    transition: 0.3s;
+}
+
+.question-card:hover {
+    transform: scale(1.01);
+}
+
+.options input {
+    margin-right: 10px;
+}
+
+.options label {
+    display: block;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.options input:checked + label {
+    background-color: #e0f2fe;
+    border-color: #0d6efd;
+}
+
+/* Question navigation */
+.q-number {
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.q-number.active {
+    background-color: #0d6efd !important;
+}
+
+.q-number.answered {
+    background-color: #198754 !important;
+}
+</style>
+
+<!-- JS -->
+<script>
+const totalQuestions = {{ form|length }};
+const inputs = document.querySelectorAll("input[type=radio]");
+const progressBar = document.getElementById("progress");
+
+// Update progress + mark answered
+inputs.forEach(input => {
+    input.addEventListener("change", () => {
+        let answered = document.querySelectorAll("input[type=radio]:checked").length;
+        let percent = (answered / totalQuestions) * 100;
+        progressBar.style.width = percent + "%";
+
+        // mark question as answered
+        let qIndex = input.name.split("_")[1];
+        document.getElementById("qnav-" + qIndex).classList.add("answered");
+    });
+});
+
+// Scroll to question on click
+document.querySelectorAll(".q-number").forEach((el, index) => {
+    el.addEventListener("click", () => {
+        document.getElementById("q" + (index + 1)).scrollIntoView({
+            behavior: "smooth"
+        });
+    });
+});
+
+// Timer (10 min)
+let time = 600;
+const timerEl = document.getElementById("timer");
+
+const interval = setInterval(() => {
+    let minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+
+    timerEl.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    time--;
+
+    if (time < 0) {
+        clearInterval(interval);
+        alert("Time's up! Submitting test...");
+        document.querySelector("form").submit();
+    }
+}, 1000);
+</script>
+
+{% endblock %}

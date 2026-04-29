@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card p-4">
+    <h2>{{ course.name }}</h2>
+    <p>{{ course.description }}</p>
+
+    <a href="/test/{{ course.id }}/" class="btn btn-primary">
+        Take Test
+    </a>
+</div>
+
+{% endblock %}
