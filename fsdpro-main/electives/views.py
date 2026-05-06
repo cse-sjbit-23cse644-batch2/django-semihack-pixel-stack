@@ -7,6 +7,10 @@ from django.shortcuts import render, redirect
 from .models import Student
 def course_list(request):
     courses = Course.objects.all()
+
+    if request.GET.get('course_id'):
+        return redirect('course_detail', course_id=request.GET.get('course_id'))
+
     return render(request, 'electives/course_list.html', {'courses': courses})
 def course_detail(request, course_id):
     course = Course.objects.get(id=course_id)

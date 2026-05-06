@@ -1,22 +1,76 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
-<h2 class="mb-4">Available Courses</h2>
+<style>
+.banner {
+    height: 250px;
+    margin: 20px auto;   /* spacing from edges */
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f4f6f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-<div class="row">
-    {% for course in courses %}
-    <div class="col-md-4 mb-4">
-        <div class="card p-3">
-            <h5>{{ course.name }}</h5>
-            <p class="text-muted">{{ course.description }}</p>
+.banner img {
+    max-height: 200px;
+    max-width: 90%;
+    object-fit: contain;
+}
 
-            <a href="{% url 'course_detail' course_id=course.id %}" class="btn btn-primary btn-sm">
-                View Details
-            </a>
-        </div>
-    </div>
-    {% endfor %}
+.container-box {
+    width: 60%;
+    margin: 30px auto;
+    padding: 30px 35px;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0px 6px 20px rgba(0,0,0,0.1);
+}
+select, button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+button {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 6px;
+}
+
+button:hover {
+    background: #16325c;
+}
+</style>
+
+<div class="banner">
+    <img src="{% static 'images/sjb_logo.png' %}" alt="College Logo">
+</div>
+<div class="card">
+    <h2>Select Your Elective</h2>
+
+    <form method="GET">
+        
+        <label>Select Semester</label>
+        <select name="semester">
+            <option>Semester 5</option>
+            <option>Semester 6</option>
+            <option>Semester 7</option>
+            <option>Semester 8</option>
+        </select>
+
+        <label>Select Course</label>
+        <select name="course_id">
+            {% for course in courses %}
+                <option value="{{ course.id }}">{{ course.name }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Proceed</button>
+    </form>
 </div>
 
 {% endblock %}
